@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Cinemachine;
+using Unity.Cinemachine;
 
 /// <summary>
 /// Begin the pendulum creator and switch cameras upon input.

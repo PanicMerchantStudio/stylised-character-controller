@@ -118,7 +118,7 @@ public class PhysicsBasedCharacterController : MonoBehaviour
         Vector3 lookDirection = Vector3.zero;
         if (lookDirectionOption == lookDirectionOptions.velocity || lookDirectionOption == lookDirectionOptions.acceleration)
         {
-            Vector3 velocity = _rb.velocity;
+            Vector3 velocity = _rb.linearVelocity;
             velocity.y = 0f;
             if (lookDirectionOption == lookDirectionOptions.velocity)
             {
@@ -244,12 +244,12 @@ public class PhysicsBasedCharacterController : MonoBehaviour
     /// <param name="rayHit">Information about the RaycastToGround.</param>
     private void MaintainHeight(RaycastHit rayHit)
     {
-        Vector3 vel = _rb.velocity;
+        Vector3 vel = _rb.linearVelocity;
         Vector3 otherVel = Vector3.zero;
         Rigidbody hitBody = rayHit.rigidbody;
         if (hitBody != null)
         {
-            otherVel = hitBody.velocity;
+            otherVel = hitBody.linearVelocity;
         }
         float rayDirVel = Vector3.Dot(_rayDir, vel);
         float otherDirVel = Vector3.Dot(_rayDir, otherVel);
@@ -421,7 +421,7 @@ public class PhysicsBasedCharacterController : MonoBehaviour
         _m_GoalVel = Vector3.MoveTowards(_m_GoalVel,
                                         goalVel,
                                         accel * Time.fixedDeltaTime);
-        Vector3 neededAccel = (_m_GoalVel - _rb.velocity) / Time.fixedDeltaTime;
+        Vector3 neededAccel = (_m_GoalVel - _rb.linearVelocity) / Time.fixedDeltaTime;
         float maxAccel = _maxAccelForce * _maxAccelerationForceFactorFromDot.Evaluate(velDot) * _maxAccelForceFactor;
         neededAccel = Vector3.ClampMagnitude(neededAccel, maxAccel);
         _rb.AddForceAtPosition(Vector3.Scale(neededAccel * _rb.mass, _moveForceScale), transform.position + new Vector3(0f, transform.localScale.y * _leanFactor, 0f)); // Using AddForceAtPosition in order to both move the player and cause the play to lean in the direction of input.
@@ -437,7 +437,7 @@ public class PhysicsBasedCharacterController : MonoBehaviour
     {
         _timeSinceJumpPressed += Time.fixedDeltaTime;
         _timeSinceJump += Time.fixedDeltaTime;
-        if (_rb.velocity.y < 0)
+        if (_rb.linearVelocity.y < 0)
         {
             _shouldMaintainHeight = true;
             _jumpReady = true;
@@ -447,7 +447,7 @@ public class PhysicsBasedCharacterController : MonoBehaviour
                 _rb.AddForce(_gravitationalForce * (_fallGravityFactor - 1f)); // Hmm... this feels a bit weird. I want a reactive jump, but I don't want it to dive all the time...
             }
         }
-        else if (_rb.velocity.y > 0)
+        else if (_rb.linearVelocity.y > 0)
         {
             if (!grounded)
             {
@@ -472,7 +472,7 @@ public class PhysicsBasedCharacterController : MonoBehaviour
                     _jumpReady = false;
                     _shouldMaintainHeight = false;
                     _isJumping = true;
-                    _rb.velocity = new Vector3(_rb.velocity.x, 0f, _rb.velocity.z); // Cheat fix... (see comment below when adding force to rigidbody).
+                    _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z); // Cheat fix... (see comment below when adding force to rigidbody).
                     if (rayHit.distance != 0) // i.e. if the ray has hit
                     {
                         _rb.position = new Vector3(_rb.position.x, _rb.position.y - (rayHit.distance - _rideHeight), _rb.position.z);
